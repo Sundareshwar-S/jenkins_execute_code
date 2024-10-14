@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    environment {
+        PYTHON_HOME = 'C:\\Users\\sunda\\AppData\\Local\\Programs\\Python\\Python312'
+        PATH = "${PYTHON_HOME};${PATH}"
+    }
+
+    stages {
+        stage('checkout') {
+            steps {
+                checkout scmGit(branches: [[name: 'main']], extensions: [], userRemoteConfigs: [[credentialsId: '6d384ab0-ef78-45a3-9ac4-e2e95b049311', url: 'https://github.com/Sundareshwar-S/jenkins_program.git']])
+            }
+        }
+        stage('Build') {
+            steps {
+                git branch: 'main', credentialsId: '6d384ab0-ef78-45a3-9ac4-e2e95b049311', url: 'https://github.com/Sundareshwar-S/jenkins_program.git'
+                bat 'python test.py' // Use 'python3' if necessary
+            }
+        }
+        stage('Test') {
+            steps {
+                echo "testing is done"
+            }
+        }
+    }
+}
