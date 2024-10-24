@@ -23,57 +23,35 @@ This project is built to demonstrate the use of Jenkins for automating the proce
 5. **Testing Automation**:  
    After the build, a test step is automated, where Jenkins runs any predefined tests or simply confirms that the build was successful. This stage is designed to ensure the code functions as expected after every build. Future improvements may include integrating detailed testing frameworks.
 
-### Project Workflow
+### Jenkins Pipeline Script
 
-1. **GitHub Repository**:  
-   The code for the project resides in a GitHub repository, and Jenkins is connected to it. The repository can contain any Python project structure.
-   
-2. **Code Checkout**:  
-   Jenkins automatically pulls the latest version of the project from the `main` branch of the repository, ensuring that the most up-to-date code is used in every build.
+Below is the Jenkins pipeline script used for automating the process:
 
-3. **Python Script Execution**:  
-   After the code is checked out, Jenkins runs a Python script using the `python` command. This can be used to compile, execute, or run tests on the Python code, making it an integral part of the build process.
+```groovy
+pipeline {
+    agent any
 
-4. **Basic Test**:  
-   After the Python script is executed, Jenkins moves to a testing step. Currently, the test confirms that the pipeline ran correctly, and future iterations can include more comprehensive test automation.
+    environment {
+        PYTHON_HOME = 'C:\\Users\\sunda\\AppData\\Local\\Programs\\Python\\Python312'
+        PATH = "${PYTHON_HOME};${PATH}"
+    }
 
-### Environment Variables and Configuration
-
-- **PYTHON_HOME**:  
-  This variable points to the directory where Python is installed. It ensures that Jenkins can find the Python interpreter needed to run the script.
-  
-- **PATH**:  
-  The system path is updated to include the Python installation directory, making the `python` command globally accessible during the pipeline execution.
-
-### Prerequisites
-
-1. **Jenkins**:  
-   Jenkins should be installed on the machine or server, and it must be properly configured to execute the pipeline. It can either run on the local machine or remotely.
-
-2. **Git**:  
-   Git should be installed on the Jenkins agent machine to allow Jenkins to pull the code from the GitHub repository.
-
-3. **Python 3.x**:  
-   The machine running Jenkins should have Python installed, as the pipeline builds and tests a Python project. Make sure to specify the correct path to your Python installation in the environment variables.
-
-4. **GitHub Credentials**:  
-   Jenkins needs to authenticate with GitHub to pull code from private repositories. Credentials are securely managed by Jenkins using a credentials ID.
-
-### Benefits of Jenkins Automation
-
-- **Efficiency**:  
-  Automating builds and tests reduces the time developers spend on manual tasks, allowing them to focus on writing code.
-
-- **Consistency**:  
-  Every time a build is triggered, the same steps are followed, ensuring consistent results.
-
-- **Scalability**:  
-  Jenkins can be easily scaled to handle more complex pipelines, with additional stages such as deployment and more thorough testing.
-
-- **Feedback**:  
-  Immediate feedback from Jenkins allows developers to know whether their code passes the build and test phases, which is essential for continuous integration and delivery.
-
-## Conclusion
-
-This project highlights the basic integration between Jenkins and GitHub for a Python project, demonstrating how Jenkins can be used to automate repetitive tasks like code checkout, building, and testing. This setup can serve as a foundation for more complex CI/CD pipelines in the future.
-
+    stages {
+        stage('checkout') {
+            steps {
+                checkout scmGit(branches: [[name: 'main']], extensions: [], userRemoteConfigs: [[credentialsId: '6d384ab0-ef78-45a3-9ac4-e2e95b049311', url: 'https://github.com/Sundareshwar-S/jenkins_program.git']])
+            }
+        }
+        stage('Build') {
+            steps {
+                git branch: 'main', credentialsId: '6d384ab0-ef78-45a3-9ac4-e2e95b049311', url: 'https://github.com/Sundareshwar-S/jenkins_program.git'
+                bat 'python test.py' // Use 'python3' if necessary
+            }
+        }
+        stage('Test') {
+            steps {
+                echo "testing is done"
+            }
+        }
+    }
+}
